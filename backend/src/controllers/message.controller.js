@@ -62,9 +62,13 @@ export const sendMessage = async (req, res)=>{
 
         const receiverSocketId = getReceiverSocketId(receiverId);
         
-        io.to(receiverSocketId).emit("newMessage", newMessage);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        } else {
+            // 🔥 Broadcast to all clients (useful when receiver is offline)
+            io.emit("newMessage", newMessage); 
+        }
         
-
         res.status(200).json(newMessage);
 
     } catch (error) {
